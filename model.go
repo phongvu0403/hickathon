@@ -171,12 +171,23 @@ func (issue *Issues) DeleteIssue(db *sql.DB, issueJiraID string) error {
 }
 
 // func (app *App) GetIssue(db *sql.DB) (sql.Result, error) {
-func (app *App) GetIssue(db *sql.DB) (*[]Issues, error) {
-	var i []Issues
-	err := db.QueryRow("SELECT * FROM issues").Scan(i)
+func (app *App) GetIssue(db *sql.DB) ([]Issues, error) {
+	rows, err := db.Query("SELECT * FROM issues")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	issues := []Issues{}
+	for rows.Next() {
+		var i Issues
+		if err := rows.Scan(&i.ID); err != nil {
+			return nil, err
+		}
+		issues = append(issues, i)
+	}
 	// issue, err := db.Exec("SELECT * FROM issues")
 	// return issue, err
-	return &i, err
+	return issues, nil
 }
 
 func (issue *Issues) GetIssueByJiraID(db *sql.DB, issueJiraID string) error {
