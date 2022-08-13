@@ -172,7 +172,7 @@ func (issue *Issues) DeleteIssue(db *sql.DB, issueJiraID string) error {
 
 // func (app *App) GetIssue(db *sql.DB) (sql.Result, error) {
 func (app *App) GetIssue(db *sql.DB) ([]Issues, error) {
-	rows, err := db.Query("SELECT * FROM issues")
+	rows, err := db.Query("SELECT id, tenant_id, vpc_id, region_id, issue_jira_id, name, data_log, error_code, status, service, created_at, updated_at FROM issues")
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,8 @@ func (app *App) GetIssue(db *sql.DB) ([]Issues, error) {
 	issues := []Issues{}
 	for rows.Next() {
 		var i Issues
-		if err := rows.Scan(i); err != nil {
+		if err := rows.Scan(&i.ID, &i.TenantID, &i.VpcID, &i.RegionID, &i.IssueJiraID, &i.Name, &i.DataLog, &i.ErrorCode,
+			&i.Status, &i.Service, &i.CreatedAt, &i.UpdatedAt); err != nil {
 			return nil, err
 		}
 		issues = append(issues, i)
