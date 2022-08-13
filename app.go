@@ -102,30 +102,25 @@ func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	vars := mux.Vars(r)
-	errorCode := vars["errorCode"]
-	content := vars["content"]
-	fmt.Println("errorCode is: ", errorCode)
-	fmt.Println("content is: ", content)
 	var projectID string
-	if strings.Contains(errorCode, "vm_") {
+	if strings.Contains(i.ErrorCode, "vm_") {
 		projectID = "10000"
-	} else if strings.Contains(errorCode, "db_") {
+	} else if strings.Contains(i.ErrorCode, "db_") {
 		projectID = "10002"
-	} else if strings.Contains(errorCode, "k8s_") {
+	} else if strings.Contains(i.ErrorCode, "k8s_") {
 		projectID = "10001"
-	} else if strings.Contains(errorCode, "api_") {
+	} else if strings.Contains(i.ErrorCode, "api_") {
 		projectID = "10003"
 	} else {
 		projectID = "10004"
 	}
-	err := PushIssueToProject(projectID, "10004", "xplat", "xplat", content)
+	err := PushIssueToProject(projectID, "10004", "xplat", "xplat", i.Content)
 	if err != nil {
 		fmt.Printf("Unable to create issue in Jira: [%s]\n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	err1 := AddStepLog(a.DB, "10004", "xplat", "xplat", content, "to do", time.Now(), time.Now())
+	err1 := AddStepLog(a.DB, "10004", "xplat", "xplat", i.Content, "to do", time.Now(), time.Now())
 	if err1 != nil {
 		fmt.Printf("Unable to add  step log to DB: [%s]\n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
