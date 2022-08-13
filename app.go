@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -74,6 +75,7 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 			respondWithError(w, http.StatusInternalServerError, "Unable to push issue to backlog of Jira")
 		}
 	} else {
+		i.CreatedAt = time.Now()
 		if err := i.createIssue(a.DB); err != nil {
 			fmt.Println("Creating issue")
 			respondWithError(w, http.StatusInternalServerError, err.Error())
