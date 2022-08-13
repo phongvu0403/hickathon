@@ -76,6 +76,7 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		i.CreatedAt = time.Now()
+		i.UpdatedAt = time.Now()
 		if err := i.createIssue(a.DB); err != nil {
 			fmt.Println("Creating issue")
 			respondWithError(w, http.StatusInternalServerError, err.Error())
