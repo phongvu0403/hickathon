@@ -39,6 +39,7 @@ func (a *App) Run(addr string) {
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/issue", a.createIssue).Methods("POST")
 	a.Router.HandleFunc("/error", a.createError).Methods("POST")
+	a.Router.HandleFunc("/issue/jira", a.createIssueInJira).Methods("POST")
 	a.Router.HandleFunc("/issue/status/{issue_jira_id:[a-zA-Z0-9]+}", a.getStatusIssue).Methods("GET")
 	a.Router.HandleFunc("/job/{issue_jira_id:[a-zA-Z0-9]*}", a.getJob).Methods("GET")
 	a.Router.HandleFunc("/issue/{issue_jira_id:[a-zA-Z0-9]*}", a.deleteIssue).Methods("DELETE")
@@ -84,12 +85,6 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 		}
 		respondWithJSON(w, http.StatusCreated, i)
 		fmt.Println("Created issue successfully")
-		a.createIssueInJira(w, r)
-		// if err := PushIssueToProject(projectID, issueType, assignee, reporter, environment, content); err != nil {
-		// 	fmt.Printf("Unable to push Issue to Jira Project: [%s]\n", err.Error())
-		// 	respondWithError(w, http.StatusInternalServerError, err.Error())
-		// 	return
-		// }
 	}
 }
 
