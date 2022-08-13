@@ -174,12 +174,12 @@ func (a *App) getStatusIssue(w http.ResponseWriter, r *http.Request) {
 	issue := Issues{
 		IssueJiraID: issueJiraID,
 	}
-	status, err := issue.getStatusIssue(a.DB, issueJiraID)
+	err := issue.getStatusIssue(a.DB, issueJiraID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJSON(w, http.StatusOK, status)
+	respondWithJSON(w, http.StatusOK, issue.Status)
 }
 
 func (a *App) getJob(w http.ResponseWriter, r *http.Request) {
