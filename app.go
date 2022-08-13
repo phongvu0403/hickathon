@@ -137,6 +137,7 @@ func PushIssueToBacklogJira() error {
 
 func PushIssueToProject(projectID, issueType, assignee, reporter, content string) error {
 	url := fmt.Sprintf("10.0.0.10:8000/issue/?project_id=%s&issuetype=%s&assignee=%s&reporter=%s&content=%s&summary=%s&environment=environment", projectID, issueType, assignee, reporter, content, content)
+	fmt.Println("url is: ", url)
 	// url := `10.0.0.10:8000/issue/?project_id=` + projectID + `&issuetype=` + issueType + `&assignee=` + assignee + `&reporter=` + reporter + `&content=` + content + `&summary=` + content + `&environment=environment`
 	method := "POST"
 	payload := strings.NewReader(``)
