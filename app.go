@@ -114,13 +114,18 @@ func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
 	} else {
 		projectID = "10004"
 	}
-	err := PushIssueToProject(projectID, "10004", "xplat", "xplat", i.Content)
+
+	jiraId, err := PushIssueToProject(projectID, "10004", "xplat-support", i.ReporterName, i.Content)
 	if err != nil {
 		fmt.Printf("Unable to create issue in Jira: [%s]\n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	err1 := AddStepLog(a.DB, "10004", "xplat", "xplat", i.Content, "to do", time.Now(), time.Now())
+
+	a.UpdateIssueJiraIdInDB(a.DB, jiraId)
+
+	err1 := AddStepLog(a.DB, jiraId, "xplat", "xplat", i.Content, "to do", time.Now(), time.Now())
+
 	if err1 != nil {
 		fmt.Printf("Unable to add  step log to DB: [%s]\n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -132,7 +137,7 @@ func PushIssueToBacklogJira() error {
 	return nil
 }
 
-func PushIssueToProject(projectID, issueType, assignee, reporter, content string) error {
+func PushIssueToProject(projectID, issueType, assignee, reporter, content string) (string, error) {
 	url := fmt.Sprintf("http://10.0.0.10:8000/issue/?project_id=%s&issuetype=%s&assignee=%s&reporter=%s&content=%s&summary=%s&environment=environment", projectID, issueType, assignee, reporter, content, content)
 	fmt.Println("url is: ", url)
 	method := "POST"
@@ -143,7 +148,7 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, content string
 
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 	req.Header.Add("Content-type", "application/json")
 
@@ -151,7 +156,7 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, content string
 	if err != nil {
 		fmt.Printf("Unable to perform request: [%s]", err.Error())
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 	defer res.Body.Close()
 
@@ -159,10 +164,17 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, content string
 	if err != nil {
 		fmt.Println(err)
 		fmt.Printf("Unable to read response body: [%s]", err.Error())
-		return err
+		return "", err
 	}
-	fmt.Println(string(body))
-	return nil
+	var responseJira ResponseJira
+	error := json.Unmarshal(body, &responseJira)
+	if error != nil {
+		// if error is not nil
+		// print error
+		fmt.Println(error)
+	}
+
+	return responseJira.Id, nil
 }
 
 func (a *App) createError(w http.ResponseWriter, r *http.Request) {
@@ -256,8 +268,16 @@ func (a *App) GetIssueByJiraID(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 	vars := mux.Vars(r)
 	issueJiraID := vars["issue_jira_id"]
+
+	fmt.Print(issueJiraID)
+
 	issue := Issues{
 		IssueJiraID: issueJiraID,
+	}
+
+	if err := issue.GetIssueByJiraID(a.DB, issueJiraID); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	logs, _ := a.GetLogsByIssueJiraId(a.DB, issueJiraID)
@@ -265,10 +285,6 @@ func (a *App) GetIssueByJiraID(w http.ResponseWriter, r *http.Request) {
 	i := IssuesReturn{
 		Issue: issue,
 		Logs:  logs,
-	}
-	if err := issue.GetIssueByJiraID(a.DB, issueJiraID); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
 	}
 
 	respondWithJSON(w, http.StatusOK, i)

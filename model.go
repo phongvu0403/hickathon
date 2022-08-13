@@ -82,8 +82,13 @@ type IssueResponse struct {
 }
 
 type IssueRequest struct {
-	ErrorCode string `json:"errorCode"`
-	Content   string `json:"content"`
+	ErrorCode    string `json:"errorCode"`
+	Content      string `json:"content"`
+	ReporterName string `json:"reporterName"`
+}
+
+type ResponseJira struct {
+	Id string `json:"id"`
 }
 
 type LogIssueResponse struct {
@@ -183,6 +188,11 @@ func (issue *Issues) getStatusIssue(db *sql.DB, issueJiraID string) error {
 
 func (issue *Issues) UpdateIssueStatusInDB(db *sql.DB, status string) error {
 	_, err := db.Exec("UPDATE issues SET status=$1", status)
+	return err
+}
+
+func (app *App) UpdateIssueJiraIdInDB(db *sql.DB, issueJiraId string) error {
+	_, err := db.Exec("UPDATE issues SET issue_jira_id=$1", issueJiraId)
 	return err
 }
 
