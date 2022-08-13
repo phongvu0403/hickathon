@@ -147,9 +147,8 @@ func (errorStore *ErrorStore) createError(db *sql.DB) error {
 }
 
 func (issue *Issues) createIssue(db *sql.DB) error {
-	statement := fmt.Sprintf("INSERT INTO issues(tenant_id, vpc_id, region_id, issue_jira_id, name, data_log, error_code, status, service, created_at, updated_at) VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %t, %t) RETURNING id",
+	_, err := db.Exec(`INSERT INTO issues(tenant_id, vpc_id, region_id, issue_jira_id, name, data_log, error_code, status, service, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
 		issue.TenantID, issue.VpcID, issue.RegionID, issue.IssueJiraID, issue.Name, issue.DataLog, issue.ErrorCode, issue.Status, issue.Service, issue.CreatedAt, issue.UpdatedAt)
-	_, err := db.Exec(statement)
 	if err != nil {
 		return err
 	}
