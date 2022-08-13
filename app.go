@@ -39,12 +39,12 @@ func (a *App) Run(addr string) {
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/issue", a.createIssue).Methods("POST")
 	a.Router.HandleFunc("/error", a.createError).Methods("POST")
-	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]+}", a.getStatusIssue).Methods("GET")
-	a.Router.HandleFunc("/job/{id:[a-zA-Z0-9]*}", a.getJob).Methods("GET")
-	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]*}", a.deleteIssue).Methods("DELETE")
-	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]*}", a.updateIssue).Methods("UPDATE")
+	a.Router.HandleFunc("/issue/{issue_jira_id:[a-zA-Z0-9]+}", a.getStatusIssue).Methods("GET")
+	a.Router.HandleFunc("/job/{issue_jira_id:[a-zA-Z0-9]*}", a.getJob).Methods("GET")
+	a.Router.HandleFunc("/issue/{issue_jira_id:[a-zA-Z0-9]*}", a.deleteIssue).Methods("DELETE")
+	a.Router.HandleFunc("/issue/{issue_jira_id:[a-zA-Z0-9]*}", a.updateIssue).Methods("UPDATE")
 	a.Router.HandleFunc("/issue", a.getIssue).Methods("GET")
-	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]*}", a.GetIssueByJiraID).Methods("GET")
+	a.Router.HandleFunc("/issue/{issue_jira_id:[a-zA-Z0-9]*}", a.GetIssueByJiraID).Methods("GET")
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
