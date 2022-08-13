@@ -239,19 +239,28 @@ func AddStepLog(db *sql.DB, IssueID, reporterName, supporterName, description, s
 }
 
 func (app *App) GetLogsByIssueJiraId(db *sql.DB, issueJiraID string) ([]LogIssueResponse, error) {
-	rows, err := db.Query("SELECT id, issue_id, reporter_name, supporter_name, description, status FROM step_log WHERE issue_id=" + issueJiraID)
+	textQ := "SELECT id, issue_id, reporter_name, supporter_name, description, status FROM step_log WHERE issue_id=" + issueJiraID
+	fmt.Print(textQ)
+	rows, err := db.Query(textQ)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	logs := []LogIssueResponse{}
+
+	count := 0
+
 	for rows.Next() {
+		count++
 		var issue LogIssueResponse
 		if err := rows.Scan(&issue.Id, &issue.IssueId, &issue.ReporterName, &issue.SupporterName, &issue.Description, &issue.Status); err != nil {
 			return nil, err
 		}
 		logs = append(logs, issue)
 	}
+
+	fmt.Print("count", count)
+
 	// issue, err := db.Exec("SELECT * FROM issues")
 	// return issue, err
 	return logs, nil
