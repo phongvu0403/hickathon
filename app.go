@@ -69,11 +69,13 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if i.ErrorCode == "" {
+		fmt.Println("Pushing issue to backlog Jira")
 		if err := PushIssueToBacklogJira(); err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Unable to push issue to backlog of Jira")
 		}
 	} else {
 		if err := i.createIssue(a.DB); err != nil {
+			fmt.Println("Creating issue")
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
