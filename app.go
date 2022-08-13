@@ -77,6 +77,7 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		respondWithJSON(w, http.StatusCreated, i)
+		fmt.Println("Created issue successfully")
 	}
 }
 
