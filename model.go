@@ -30,7 +30,8 @@ type Issues struct {
 
 type StepLog struct {
 	BaseModel
-	ReporterID    string `json:"reporterId"`
+	ReporterName  string `json:"reporterName"`
+	SupporterName string `json:"supporterName"`
 	IssueID       string `json:"issueID"`
 	Description   string `json:"description"`
 	SupporterJira string `json:"supporterJira"`
@@ -219,4 +220,14 @@ func (issue *Issues) GetIssueByJiraID(db *sql.DB, issueJiraID string) error {
 	return db.QueryRow("SELECT id, tenant_id, vpc_id, region_id, name, data_log, error_code, status, service, created_at, updated_at FROM issues WHERE issue_jira_id=$1",
 		issueJiraID).Scan(&issue.ID, &issue.TenantID, &issue.VpcID, &issue.RegionID, &issue.Name, &issue.DataLog, &issue.ErrorCode,
 		&issue.Status, &issue.Service, &issue.CreatedAt, &issue.UpdatedAt)
+}
+
+func AddStepLog(db *sql.DB, IssueID, reporterName, supporterName, description, status string, createdAt, updatedAt time.Time) error {
+	var stepLog StepLog
+	err := db.QueryRow("INSERT INTO step_log(issue_id, reporter_name, supporter_name, description, status, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+		IssueID, reporterName, supporterName, description, status, createdAt, updatedAt).Scan(&stepLog.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

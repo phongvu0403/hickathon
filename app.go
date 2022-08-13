@@ -102,9 +102,30 @@ func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	err := PushIssueToProject(i.Fields.Project.ID, i.Fields.IssueType.ID, i.Fields.Assignee.Name, i.Fields.Reporter.Name, i.Fields.Environment, i.Fields.Description)
+	vars := mux.Vars(r)
+	errorCode := vars["error_code"]
+	content := vars["content"]
+	var projectID string
+	if strings.Contains(errorCode, "vm_") {
+		projectID = "10000"
+	} else if strings.Contains(errorCode, "db_") {
+		projectID = "10002"
+	} else if strings.Contains(errorCode, "k8s_") {
+		projectID = "10001"
+	} else if strings.Contains(errorCode, "api_") {
+		projectID = "10003"
+	} else {
+		projectID = "10004"
+	}
+	err := PushIssueToProject(projectID, "10004", "xplat", "xplat", content)
 	if err != nil {
-		fmt.Printf("Unable to create issue in Jira: [%s]", err.Error())
+		fmt.Printf("Unable to create issue in Jira: [%s]\n", err.Error())
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	err1 := AddStepLog(a.DB, "10004", "xplat", "xplat", content, "to do", time.Now(), time.Now())
+	if err1 != nil {
+		fmt.Printf("Unable to add  step log to DB: [%s]\n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -114,38 +135,10 @@ func PushIssueToBacklogJira() error {
 	return nil
 }
 
-func PushIssueToProject(projectID, issueType, assignee, reporter, environment, content string) error {
-	url := "http://10.0.0.4:8080/rest/api/2/issue"
+func PushIssueToProject(projectID, issueType, assignee, reporter, content string) error {
+	url := "10.0.0.10:8000/issue/?project_id=" + projectID + "&issuetype=" + issueType + "&assignee=" + assignee + "&reporter=" + reporter + "&content=" + content + "&summary=" + content + "&environment=environment"
 	method := "POST"
-	data := fmt.Sprintf(`{
-        "update": {      
-        },
-        "fields": {
-        "project": {
-            "id": %s
-        },
-        "summary": summary,
-        "issuetype": {
-            "id": %s
-        },
-        "assignee": {
-            "name": %s
-        },
-        "reporter": {
-            "name": %s
-        },
-        
-        "environment": %s,
-        "description": %s,
-        
-        "components": [
-            {
-            "id": "10000"
-            }
-        ]
-        }
-    }`, projectID, issueType, assignee, reporter, environment, content)
-	payload := strings.NewReader(data)
+	payload := strings.NewReader(``)
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
