@@ -239,7 +239,7 @@ func AddStepLog(db *sql.DB, IssueID, reporterName, supporterName, description, s
 }
 
 func (app *App) GetLogsByIssueJiraId(db *sql.DB, issueJiraID string) ([]LogIssueResponse, error) {
-	textQ := "SELECT id, issue_id, reporter_name, supporter_name, description, status FROM step_log WHERE issue_id=" + issueJiraID
+	textQ := "SELECT id, issue_id, reporter_name, supporter_name, description, status FROM step_log WHERE issue_id='" + string(issueJiraID) + "'"
 	fmt.Print(textQ)
 	rows, err := db.Query(textQ)
 	if err != nil {
