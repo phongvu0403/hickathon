@@ -61,6 +61,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 	var i Issues
 	decoder := json.NewDecoder(r.Body)
+	fmt.Println("Decoding body request creating issue")
 	if err := decoder.Decode(&i); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
