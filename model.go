@@ -147,12 +147,8 @@ func (errorStore *ErrorStore) createError(db *sql.DB) error {
 }
 
 func (issue *Issues) createIssue(db *sql.DB) error {
-	_, err := db.Exec(`INSERT INTO issues(tenant_id, vpc_id, region_id, issue_jira_id, name, data_log, error_code, status, service, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
-		issue.TenantID, issue.VpcID, issue.RegionID, issue.IssueJiraID, issue.Name, issue.DataLog, issue.ErrorCode, issue.Status, issue.Service, issue.CreatedAt, issue.UpdatedAt)
-	if err != nil {
-		return err
-	}
-	err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&issue.ID)
+	err := db.QueryRow("INSERT INTO issues(tenant_id, vpc_id, region_id, issue_jira_id, name, data_log, error_code, status, service, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
+		issue.TenantID, issue.VpcID, issue.RegionID, issue.IssueJiraID, issue.Name, issue.DataLog, issue.ErrorCode, issue.Status, issue.Service, issue.CreatedAt, issue.UpdatedAt).Scan(&issue.ID)
 	if err != nil {
 		return err
 	}
