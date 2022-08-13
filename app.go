@@ -210,15 +210,20 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, content string
 		fmt.Printf("Unable to read response body: [%s]", err.Error())
 		return "", err
 	}
+
+	fmt.Print(body)
+
 	var responseJira ResponseJira
 	error := json.Unmarshal(body, &responseJira)
+
 	if error != nil {
 		// if error is not nil
 		// print error
-		fmt.Println(error)
+		fmt.Println("looix roi")
 	}
 
 	fmt.Sprintf(responseJira.Id)
+	fmt.Print(responseJira.Id)
 
 	return responseJira.Id, nil
 }
