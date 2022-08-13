@@ -103,7 +103,7 @@ func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	vars := mux.Vars(r)
-	errorCode := vars["error_code"]
+	errorCode := vars["errorCode"]
 	content := vars["content"]
 	var projectID string
 	if strings.Contains(errorCode, "vm_") {

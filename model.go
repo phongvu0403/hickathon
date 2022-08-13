@@ -76,27 +76,8 @@ type IssueResponse struct {
 }
 
 type IssueRequest struct {
-	Update struct{} `json:"update"`
-	Fields struct {
-		Project struct {
-			ID string `json:"id"`
-		} `json:"project"`
-		Summary   string `json:"summary"`
-		IssueType struct {
-			ID string `json:"id"`
-		} `json:"issuetype"`
-		Assignee struct {
-			Name string `json:"name"`
-		} `json:"assignee"`
-		Reporter struct {
-			Name string `json:"name"`
-		} `json:"reporter"`
-		Environment string `json:"environment"`
-		Description string `json:"description"`
-		Components  []struct {
-			ID string `json:"id"`
-		} `json:"components"`
-	}
+	ErrorCode string `json:"errorCode"`
+	Content   string `json:"content"`
 }
 
 func (issue *Issues) ApiJob(db *sql.DB, issueJiraID string) {
