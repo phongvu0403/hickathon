@@ -152,7 +152,7 @@ func (issue *Issues) createIssue(db *sql.DB) error {
 
 func (issue *Issues) getStatusIssue(db *sql.DB, issueJiraID string) error {
 	// var status string
-	err := db.QueryRow("SELECT status FROM issues WHERE issue_jira_id=$1", issueJiraID).Scan(issue.Status)
+	err := db.QueryRow("SELECT status FROM issues WHERE issue_jira_id=$1", issueJiraID).Scan(&issue.Status)
 	if err != nil {
 		fmt.Printf("Unable to query status with issue_jira_id from issues table")
 		return fmt.Errorf("Unable to query status with issue_jira_id from issues table: [%s]", err.Error())
