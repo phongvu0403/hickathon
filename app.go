@@ -105,6 +105,8 @@ func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	errorCode := vars["errorCode"]
 	content := vars["content"]
+	fmt.Println("errorCode is: ", errorCode)
+	fmt.Println("content is: ", content)
 	var projectID string
 	if strings.Contains(errorCode, "vm_") {
 		projectID = "10000"
