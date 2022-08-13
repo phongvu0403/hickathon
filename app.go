@@ -206,9 +206,9 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, content string
 	fmt.Print(body)
 	dataBody := []byte(body)
 	var responseJira ResponseJira
-	error := json.Unmarshal(dataBody, &responseJira)
+	err = json.Unmarshal(dataBody, &responseJira)
 
-	if error != nil {
+	if err != nil {
 		// if error is not nil
 		// print error
 		fmt.Println("looix roi")
