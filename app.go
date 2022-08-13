@@ -171,6 +171,7 @@ func (a *App) createError(w http.ResponseWriter, r *http.Request) {
 func (a *App) getStatusIssue(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	issueJiraID := vars["issue_jira_id"]
+	fmt.Println("issue_jira_id is: ", issueJiraID)
 	issue := Issues{
 		IssueJiraID: issueJiraID,
 	}
