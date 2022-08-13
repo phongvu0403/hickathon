@@ -65,7 +65,7 @@ func enableCors(w *http.ResponseWriter) {
 
 func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
-	var i Issues
+	var i IssueRequest
 	decoder := json.NewDecoder(r.Body)
 	fmt.Println("Decoding body request creating issue")
 	if err := decoder.Decode(&i); err != nil {
@@ -80,13 +80,57 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 			respondWithError(w, http.StatusInternalServerError, "Unable to push issue to backlog of Jira")
 		}
 	} else {
-		i.CreatedAt = time.Now()
-		i.UpdatedAt = time.Now()
-		if err := i.createIssue(a.DB); err != nil {
+		var i IssueRequest
+		var projectID string
+		if strings.Contains(i.ErrorCode, "vm_") {
+			projectID = "10000"
+		} else if strings.Contains(i.ErrorCode, "db_") {
+			projectID = "10002"
+		} else if strings.Contains(i.ErrorCode, "k8s_") {
+			projectID = "10001"
+		} else if strings.Contains(i.ErrorCode, "api_") {
+			projectID = "10003"
+		} else {
+			projectID = "10004"
+		}
+
+		jiraId, err := PushIssueToProject(projectID, "10004", "xplat-support", i.ReporterName, i.Content)
+		if err != nil {
+			fmt.Printf("Unable to create issue in Jira: [%s]\n", err.Error())
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		iDB := Issues{
+			TenantID:    "00001-HN",
+			VpcID:       "12fg5fj4",
+			RegionID:    "HA NOI",
+			IssueJiraID: jiraId,
+			Name:        "K8s Error Network Internal",
+			DataLog:     i.Content,
+			ErrorCode:   i.ErrorCode,
+			Status:      "TO DO",
+			Service:     "K8S",
+		}
+
+		iDB.CreatedAt = time.Now()
+		iDB.UpdatedAt = time.Now()
+		if err := iDB.createIssue(a.DB); err != nil {
 			fmt.Println("Creating issue")
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+
+		// a.UpdateIssueJiraIdInDB(a.DB, jiraId)
+
+		err1 := AddStepLog(a.DB, jiraId, "xplat", "xplat", i.Content, "to do", time.Now(), time.Now())
+
+		if err1 != nil {
+			fmt.Printf("Unable to add  step log to DB: [%s]\n", err.Error())
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
 		respondWithJSON(w, http.StatusCreated, i)
 		fmt.Println("Created issue successfully")
 	}
