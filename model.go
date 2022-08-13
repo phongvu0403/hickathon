@@ -192,6 +192,6 @@ func (app *App) GetIssue(db *sql.DB) ([]Issues, error) {
 
 func (issue *Issues) GetIssueByJiraID(db *sql.DB, issueJiraID string) error {
 	var i Issues
-	return db.QueryRow("SELECT * FROM issues WHERE issue_jira_id=$1", issueJiraID).Scan(&i.ID, &i.TenantID, &i.VpcID, &i.RegionID, &i.IssueJiraID,
-		&i.Name, &i.DataLog, &i.ErrorCode, &i.Status, &i.Service, &i.CreatedAt, &i.UpdatedAt)
+	return db.QueryRow("SELECT id, tenant_id, vpc_id, region_id, name, data_log, error_code, status, service, created_at, updated_at FROM issues WHERE issue_jira_id=$1",
+		issueJiraID).Scan(&i.ID, &i.TenantID, &i.VpcID, &i.RegionID, &i.IssueJiraID, &i.Name, &i.DataLog, &i.ErrorCode, &i.Status, &i.Service, &i.CreatedAt, &i.UpdatedAt)
 }
