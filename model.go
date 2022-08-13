@@ -180,7 +180,7 @@ func (app *App) GetIssue(db *sql.DB) ([]Issues, error) {
 	issues := []Issues{}
 	for rows.Next() {
 		var i Issues
-		if err := rows.Scan(&i.ID); err != nil {
+		if err := rows.Scan(i); err != nil {
 			return nil, err
 		}
 		issues = append(issues, i)
