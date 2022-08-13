@@ -204,20 +204,22 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, content string
 	}
 
 	fmt.Print(body)
-	dataBody := []byte(body)
-	var responseJira ResponseJira
-	err = json.Unmarshal(dataBody, &responseJira)
+	// dataBody := []byte(body)
+	// var responseJira ResponseJira
+	// err = json.Unmarshal(dataBody, &responseJira)
 
-	if err != nil {
-		// if error is not nil
-		// print error
-		fmt.Println("looix roi")
-	}
+	// out, _ := json.Marshal(body)
 
-	// fmt.Sprintf(responseJira.Id)
-	fmt.Print(responseJira.Id)
+	// if err != nil {
+	// 	// if error is not nil
+	// 	// print error
+	// 	fmt.Println("looix roi")
+	// }
 
-	return responseJira.Id, nil
+	// // fmt.Sprintf(responseJira.Id)
+	// fmt.Print(out.Id)
+
+	return string(body)[7:12], nil
 }
 
 func (a *App) createError(w http.ResponseWriter, r *http.Request) {
