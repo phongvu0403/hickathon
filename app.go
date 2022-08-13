@@ -87,7 +87,7 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 		projectID = "10004"
 	}
 
-	jiraId, err := PushIssueToProject(projectID, "10004", "xplat-support", i.ReporterName, i.Content)
+	jiraId, err := PushIssueToProject(projectID, "10004", "xplat", i.ReporterName, i.Content)
 	if err != nil {
 		fmt.Printf("Unable to create issue in Jira: [%s]\n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -151,7 +151,7 @@ func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
 		projectID = "10004"
 	}
 
-	jiraId, err := PushIssueToProject(projectID, "10004", "xplat-support", i.ReporterName, i.Content)
+	jiraId, err := PushIssueToProject(projectID, "10004", "xplat", i.ReporterName, i.Content)
 	if err != nil {
 		fmt.Printf("Unable to create issue in Jira: [%s]\n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
