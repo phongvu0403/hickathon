@@ -39,7 +39,7 @@ func (a *App) Run(addr string) {
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/issue", a.createIssue).Methods("POST")
 	a.Router.HandleFunc("/error", a.createError).Methods("POST")
-	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]*}", a.getStatusIssue).Methods("GET")
+	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]+}", a.getStatusIssue).Methods("GET")
 	a.Router.HandleFunc("/job/{id:[a-zA-Z0-9]*}", a.getJob).Methods("GET")
 	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]*}", a.deleteIssue).Methods("DELETE")
 	a.Router.HandleFunc("/issue/{id:[a-zA-Z0-9]*}", a.updateIssue).Methods("UPDATE")
