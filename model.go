@@ -133,13 +133,8 @@ func (issue *Issues) GetJiraIssueStatus(db *sql.DB, issueJiraID string) string {
 }
 
 func (errorStore *ErrorStore) createError(db *sql.DB) error {
-	statement := fmt.Sprintf("INSERT INTO error_store(error_code, name, discription, service) VALUES('%s', '%s', '%s', '%s') RETURNING id",
+	_, err := db.Exec("INSERT INTO error_store(error_code, name, discription, service created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6) RETURNING id",
 		errorStore.ErrorCode, errorStore.Name, errorStore.Description, errorStore.Service)
-	_, err := db.Exec(statement)
-	if err != nil {
-		return err
-	}
-	err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&errorStore.ID)
 	if err != nil {
 		return err
 	}

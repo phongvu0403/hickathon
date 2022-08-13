@@ -157,6 +157,8 @@ func (a *App) createError(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
+	e.CreatedAt = time.Now()
+	e.UpdatedAt = time.Now()
 	if err := e.createError(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
