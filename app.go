@@ -84,17 +84,29 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 		}
 		respondWithJSON(w, http.StatusCreated, i)
 		fmt.Println("Created issue successfully")
-		projectID := r.FormValue("projectID")
-		issueType := r.FormValue("issueType")
-		assignee := r.FormValue("assignee")
-		reporter := r.FormValue("reporter")
-		environment := r.FormValue("environment")
-		content := r.FormValue("content")
-		if err := PushIssueToProject(projectID, issueType, assignee, reporter, environment, content); err != nil {
-			fmt.Printf("Unable to push Issue to Jira Project: [%s]\n", err.Error())
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
+		a.createIssueInJira(w, r)
+		// if err := PushIssueToProject(projectID, issueType, assignee, reporter, environment, content); err != nil {
+		// 	fmt.Printf("Unable to push Issue to Jira Project: [%s]\n", err.Error())
+		// 	respondWithError(w, http.StatusInternalServerError, err.Error())
+		// 	return
+		// }
+	}
+}
+
+func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
+	var i IssueRequest
+	decoder := json.NewDecoder(r.Body)
+	fmt.Println("Decoding body request creating issue")
+	if err := decoder.Decode(&i); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	defer r.Body.Close()
+	err := PushIssueToProject(i.Fields.Project.ID, i.Fields.IssueType.ID, i.Fields.Assignee.Name, i.Fields.Reporter.Name, i.Fields.Environment, i.Fields.Description)
+	if err != nil {
+		fmt.Printf("Unable to create issue in Jira: [%s]", err.Error())
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 }
 
