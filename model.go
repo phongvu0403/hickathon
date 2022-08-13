@@ -170,9 +170,13 @@ func (issue *Issues) DeleteIssue(db *sql.DB, issueJiraID string) error {
 	return err
 }
 
-func (app *App) GetIssue(db *sql.DB) (sql.Result, error) {
-	issue, err := db.Exec("SELECT * FROM issues")
-	return issue, err
+// func (app *App) GetIssue(db *sql.DB) (sql.Result, error) {
+func (app *App) GetIssue(db *sql.DB) (*[]Issues, error) {
+	var i []Issues
+	err := db.QueryRow("SELECT * FROM issues").Scan(i)
+	// issue, err := db.Exec("SELECT * FROM issues")
+	// return issue, err
+	return &i, err
 }
 
 func (issue *Issues) GetIssueByJiraID(db *sql.DB, issueJiraID string) error {
