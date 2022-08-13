@@ -160,9 +160,11 @@ func (a *App) createError(w http.ResponseWriter, r *http.Request) {
 	e.CreatedAt = time.Now()
 	e.UpdatedAt = time.Now()
 	if err := e.createError(a.DB); err != nil {
+		fmt.Println("Creating error store")
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	fmt.Println("Created error store successfully")
 	respondWithJSON(w, http.StatusCreated, e)
 }
 
