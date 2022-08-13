@@ -84,6 +84,17 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 		}
 		respondWithJSON(w, http.StatusCreated, i)
 		fmt.Println("Created issue successfully")
+		projectID := r.FormValue("projectID")
+		issueType := r.FormValue("issueType")
+		assignee := r.FormValue("assignee")
+		reporter := r.FormValue("reporter")
+		environment := r.FormValue("environment")
+		content := r.FormValue("content")
+		if err := PushIssueToProject(projectID, issueType, assignee, reporter, environment, content); err != nil {
+			fmt.Printf("Unable to push Issue to Jira Project: [%s]\n", err.Error())
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 }
 
@@ -91,7 +102,7 @@ func PushIssueToBacklogJira() error {
 	return nil
 }
 
-func PushIsseToProject(projectID, issueType, assignee, reporter, environment, content string) error {
+func PushIssueToProject(projectID, issueType, assignee, reporter, environment, content string) error {
 	url := "http://10.0.0.4:8080/rest/api/2/issue"
 	method := "POST"
 	data := fmt.Sprintf(`{
