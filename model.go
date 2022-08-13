@@ -15,6 +15,7 @@ type BaseModel struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
 type Issues struct {
 	BaseModel
 	TenantID    string `json:"tenantId"`
@@ -26,6 +27,11 @@ type Issues struct {
 	ErrorCode   string `json:"errorCode"`
 	Status      string `json:"status"`
 	Service     string `json:"service"`
+}
+
+type IssuesReturn struct {
+	Issue Issues
+	Logs  []LogIssueResponse
 }
 
 type StepLog struct {
@@ -78,6 +84,15 @@ type IssueResponse struct {
 type IssueRequest struct {
 	ErrorCode string `json:"errorCode"`
 	Content   string `json:"content"`
+}
+
+type LogIssueResponse struct {
+	Id            string `json:"id"`
+	IssueId       string `json:"issueId"`
+	Status        string `json:"status"`
+	ReporterName  string `json:"reporterName"`
+	SupporterName string `json:"supporterName"`
+	Description   string `json:"description"`
 }
 
 func (issue *Issues) ApiJob(db *sql.DB, issueJiraID string) {
@@ -211,4 +226,23 @@ func AddStepLog(db *sql.DB, IssueID, reporterName, supporterName, description, s
 		return err
 	}
 	return nil
+}
+
+func (app *App) GetLogsByIssueJiraId(db *sql.DB, issueJiraID string) ([]LogIssueResponse, error) {
+	rows, err := db.Query("SELECT id, issue_id, reporter_name, supporter_name, description, status FROM step_log WHERE issue_id=" + issueJiraID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	logs := []LogIssueResponse{}
+	for rows.Next() {
+		var issue LogIssueResponse
+		if err := rows.Scan(&issue.Id, &issue.IssueId, &issue.ReporterName, &issue.SupporterName, &issue.Description, &issue.Status); err != nil {
+			return nil, err
+		}
+		logs = append(logs, issue)
+	}
+	// issue, err := db.Exec("SELECT * FROM issues")
+	// return issue, err
+	return logs, nil
 }

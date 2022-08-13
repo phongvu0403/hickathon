@@ -259,9 +259,17 @@ func (a *App) GetIssueByJiraID(w http.ResponseWriter, r *http.Request) {
 	issue := Issues{
 		IssueJiraID: issueJiraID,
 	}
+
+	logs, _ := a.GetLogsByIssueJiraId(a.DB, issueJiraID)
+
+	i := IssuesReturn{
+		Issue: issue,
+		Logs:  logs,
+	}
 	if err := issue.GetIssueByJiraID(a.DB, issueJiraID); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJSON(w, http.StatusOK, issue)
+
+	respondWithJSON(w, http.StatusOK, i)
 }
