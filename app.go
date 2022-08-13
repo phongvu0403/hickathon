@@ -218,6 +218,9 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, content string
 		fmt.Println(error)
 	}
 
+	fmt.Print(responseJira)
+	fmt.Print(responseJira.Id)
+
 	return responseJira.Id, nil
 }
 
