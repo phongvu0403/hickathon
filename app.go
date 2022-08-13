@@ -59,8 +59,12 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.WriteHeader(code)
 	w.Write(response)
 }
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
 
 func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	var i Issues
 	decoder := json.NewDecoder(r.Body)
 	fmt.Println("Decoding body request creating issue")
@@ -89,6 +93,7 @@ func (a *App) createIssue(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) createIssueInJira(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	var i IssueRequest
 	decoder := json.NewDecoder(r.Body)
 	fmt.Println("Decoding body request creating issue")
@@ -168,6 +173,7 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, environment, c
 }
 
 func (a *App) createError(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	var e ErrorStore
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&e); err != nil {
@@ -187,6 +193,7 @@ func (a *App) createError(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) getStatusIssue(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	vars := mux.Vars(r)
 	issueJiraID := vars["issue_jira_id"]
 	fmt.Println("issue_jira_id is: ", issueJiraID)
@@ -202,6 +209,7 @@ func (a *App) getStatusIssue(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) getJob(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	vars := mux.Vars(r)
 	issueJiraID := vars["issue_jira_id"]
 	issue := Issues{
@@ -213,6 +221,7 @@ func (a *App) getJob(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) deleteIssue(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	vars := mux.Vars(r)
 	issueJiraID := vars["issue_jira_id"]
 	issue := Issues{
@@ -226,6 +235,7 @@ func (a *App) deleteIssue(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) updateIssue(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	vars := mux.Vars(r)
 	issueJiraID := vars["issue_jira_id"]
 	status := vars["status"]
@@ -240,6 +250,7 @@ func (a *App) updateIssue(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) getIssue(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	issue, err := a.GetIssue(a.DB)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -249,6 +260,7 @@ func (a *App) getIssue(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) GetIssueByJiraID(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	vars := mux.Vars(r)
 	issueJiraID := vars["issue_jira_id"]
 	issue := Issues{
