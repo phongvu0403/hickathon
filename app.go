@@ -158,6 +158,7 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, environment, c
 
 	res, err := client.Do(req)
 	if err != nil {
+		fmt.Printf("Unable to perform request: [%s]", err.Error())
 		fmt.Println(err)
 		return err
 	}
@@ -166,6 +167,7 @@ func PushIssueToProject(projectID, issueType, assignee, reporter, environment, c
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println(err)
+		fmt.Printf("Unable to read response body: [%s]", err.Error())
 		return err
 	}
 	fmt.Println(string(body))
